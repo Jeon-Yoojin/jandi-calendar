@@ -61,7 +61,7 @@ function plantGrass(row: number, col: number, href: string): string {
       <g transform="translate(${150 * (col % 7)}, ${115 * row + headerHeight + 30})">
         <rect width="150" height="30" fill="#ffffff" />
         <rect width="20" height="30" fill="#0077B6" />
-        <text x="40" y="15" font-size="16" fill="#0077B6" text-anchor="middle" dominant-baseline="middle">${textEllipsis(href)}</text>
+        <text x="25" y="15" font-size="16" fill="#0077B6" dominant-baseline="middle">${textEllipsis(href)}</text>
       </g>
     </a>
   `;
@@ -71,11 +71,9 @@ function textEllipsis(text: string) {
   const maxLength = 15;
   const filename = text.split('/').pop()?.replace('.md', '') || text;
 
-  if (filename.length <= maxLength) {
-    return filename;
-  }
-
-  return `${filename.slice(0, maxLength)}...`;
+  return filename.length <= maxLength
+    ? filename
+    : `${filename.slice(0, maxLength)}...`;
 }
 
 export async function GET() {
@@ -90,7 +88,12 @@ export async function GET() {
     svg += calendarCell(i + 1, Math.floor((i + offset) / 7), (i + offset) % 7);
   }
 
-  const commits = await getRepoCommitHistory('Jeon-Yoojin', 'jandi-calendar');
+  const commits = await getRepoCommitHistory(
+    'Jeon-Yoojin',
+    'jandi-calendar',
+    firstDay,
+    lastDay
+  );
 
   const grasses = commits.map(({ date, filename }) => {
     return { ...dateToCoords(date, offset), filename };

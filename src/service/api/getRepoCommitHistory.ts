@@ -55,11 +55,16 @@ async function getCommitDetail(
 
 export const getRepoCommitHistory = async (
   username: string,
-  repository: string
+  repository: string,
+  startDate?: Date,
+  endDate?: Date
 ): Promise<CommitHistory[]> => {
   try {
+    const since = startDate?.toISOString() || new Date(0).toISOString();
+    const until = endDate?.toISOString() || new Date().toISOString();
+
     const commits = await getData<GitHubCommitListResDto[]>(
-      `https://api.github.com/repos/${username}/${repository}/commits`
+      `https://api.github.com/repos/${username}/${repository}/commits?since=${since}&until=${until}`
     );
 
     const commitDetails = await Promise.all(
