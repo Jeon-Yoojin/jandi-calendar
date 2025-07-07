@@ -73,9 +73,9 @@ export const getRepoCommitHistory = async (
     return validCommits.flatMap((commit) =>
       commit.files
         .filter(
-          (file) =>
-            file.status === 'added' &&
-            (file.filename.includes('TIL') || file.filename.endsWith('.md'))
+          (file) => file.status === 'added'
+          // &&
+          // (file.filename.includes('TIL') || file.filename.endsWith('.md'))
         )
         .map((file) => ({
           date: new Date(commit.commit.author.date).toISOString().split('T')[0],

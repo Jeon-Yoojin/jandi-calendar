@@ -1,7 +1,12 @@
 import { ErrorCode } from '@/enums/error';
 
 export const getData = async <T>(url: string | URL | globalThis.Request) => {
-  const res = await fetch(url, { cache: 'no-store' });
+  const res = await fetch(url, {
+    cache: 'no-store',
+    headers: {
+      Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+    },
+  });
 
   if (!res.ok) {
     throw new Error(ErrorCode.FETCH_API);
