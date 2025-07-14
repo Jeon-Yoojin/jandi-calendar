@@ -1,4 +1,6 @@
 import { getRepoCommitHistory } from '@/service/api/getRepoCommitHistory';
+import { GITHUB_BASE_URL, resolveRepoUrl } from '@/utils/gitRepository';
+import { NextRequest } from 'next/server';
 
 const headerHeight = 40;
 const today = new Date();
@@ -54,17 +56,18 @@ function calendarCell(date: number, row: number, col: number): string {
   `;
 }
 
-function plantGrass(row: number, col: number, href: string): string {
-  const username = 'Jeon-Yoojin';
-  const repository = 'jandi-calendar';
-  const branch = 'main';
-
+function plantGrass(
+  row: number,
+  col: number,
+  filename: string,
+  href: string
+): string {
   return `
-    <a href="https://github.com/${username}/${repository}/blob/${branch}/${encodeURI(href)}" target="_blank">
+    <a href="${href}" target="_blank">
       <g transform="translate(${150 * (col % 7)}, ${115 * row + headerHeight + 30})">
         <rect width="150" height="30" fill="#ffffff" />
         <rect width="20" height="30" fill="#0077B6" />
-        <text x="25" y="15" font-size="16" fill="#0077B6" dominant-baseline="middle">${textEllipsis(href)}</text>
+        <text x="25" y="15" font-size="16" fill="#0077B6" dominant-baseline="middle">${textEllipsis(filename)}</text>
       </g>
     </a>
   `;
@@ -79,7 +82,13 @@ function textEllipsis(text: string) {
     : `${filename.slice(0, maxLength)}...`;
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
+  const repo_url = searchParams.get('repo_url') || '';
+
+  const { user, repo } = resolveRepoUrl(repo_url);
+  const branch = 'main';
+
   const firstDay = getFirstDayInMonth(year, month);
   const lastDay = getLastDayInMonth(year, month);
   const offset = firstDay.getDay();
@@ -91,19 +100,23 @@ export async function GET() {
     svg += calendarCell(i + 1, Math.floor((i + offset) / 7), (i + offset) % 7);
   }
 
-  const commits = await getRepoCommitHistory(
-    'Jeon-Yoojin',
-    'jandi-calendar',
-    firstDay,
-    lastDay
-  );
+  const commits = await getRepoCommitHistory(user, repo, firstDay, lastDay);
 
   const grasses = commits.map(({ date, filename }) => {
-    return { ...dateToCoords(date, offset), filename };
+    return {
+      ...dateToCoords(date, offset),
+      filename,
+      href: `${GITHUB_BASE_URL}/${user}/${repo}/blob/${branch}/${filename}`,
+    };
   });
 
   for (const grass of grasses) {
-    svg += plantGrass(grass.row, grass.col, grass.filename);
+    svg += plantGrass(
+      grass.row,
+      grass.col,
+      grass.filename,
+      encodeURI(grass.href)
+    );
   }
 
   svg += `</svg>`;
