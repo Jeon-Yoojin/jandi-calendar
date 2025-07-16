@@ -63,11 +63,11 @@ function plantGrass(
   href: string
 ): string {
   return `
-    <a href="${href}" target="_blank">
+    <a href="${href}" target="_blank" rel="noopener noreferrer">
       <g transform="translate(${150 * (col % 7)}, ${115 * row + headerHeight + 30})">
-        <rect width="150" height="30" fill="#ffffff" />
-        <rect width="20" height="30" fill="#0077B6" />
-        <text x="25" y="15" font-size="16" fill="#0077B6" dominant-baseline="middle">${textEllipsis(filename)}</text>
+        <rect width="150" height="30" fill="#ffffff" pointer-events="all" cursor="pointer" />
+        <rect width="20" height="30" fill="#0077B6" pointer-events="all" cursor="pointer" />
+        <text x="25" y="15" font-size="16" fill="#0077B6" dominant-baseline="middle" pointer-events="all" cursor="pointer">${textEllipsis(filename)}</text>
       </g>
     </a>
   `;
@@ -124,6 +124,9 @@ export async function GET(request: NextRequest) {
   return new Response(svg, {
     headers: {
       'Content-Type': 'image/svg+xml',
+      'Cache-Control': 'no-store',
+      'Content-Security-Policy':
+        "default-src 'self' https: data: 'unsafe-inline'",
     },
   });
 }
