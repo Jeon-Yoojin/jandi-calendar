@@ -49,7 +49,9 @@ function calendarCell(date: number, row: number, col: number): string {
 
   return `
     <g transform="translate(0, ${headerHeight})" data-date="${date}">
-      <rect width="150" height="115" fill="${col === 0 || col === 6 ? '#fcfcfc' : '#ffffff'}" x="${150 * (col % 7)}" y="${115 * row}" stroke="#e5e5e5" stroke-width="1" />
+      <rect width="150" height="115" fill="${col === 0 || col === 6 ? '#fcfcfc' : '#ffffff'}" x="${150 * (col % 7)}" y="${115 * row}" stroke="#e5e5e5" stroke-width="1">
+        <animate attributeName="fill" from="#ffffff" to="#D0F0FD" dur="0.5s" begin="${0.2 * (date - 1)}s" fill="freeze" />
+      </rect>
       ${date === todayDate ? `<circle cx="${150 * (col % 7) + (150 - 25) + 7.5}" cy="${115 * row + 25 - 7.5}" r="15" fill="red" />` : ''}
       <text x="${150 * (col % 7) + (150 - 25) + (date === 1 ? -20 : 0)}" y="${115 * row + 25}" font-size="20" fill="${date === todayDate ? 'white' : 'black'}">${date === 1 ? `${month + 1}월 ${date}` : date}</text>
     </g>
