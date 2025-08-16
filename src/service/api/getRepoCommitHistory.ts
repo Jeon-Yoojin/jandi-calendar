@@ -79,6 +79,7 @@ export const getRepoCommitHistory = async (
       commit.files
         .filter(
           (file) => file.status === 'added'
+          // TBD: TIL용으로 쓴 문서만 filter
           // &&
           // (file.filename.includes('TIL') || file.filename.endsWith('.md'))
         )
